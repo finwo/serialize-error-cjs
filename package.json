@@ -19,7 +19,16 @@
     "convert",
     "deserialize"
   ],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finwo/serialize-error-cjs"
+  },
+  "author": {
+    "name": "Robin Bron",
+    "email": "robin@finwo.nl",
+    "url": "https://finwo.nl"
+  },
+  "funding": "https://github.com/sponsors/finwo",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.7.13",
