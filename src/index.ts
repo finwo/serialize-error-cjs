@@ -33,11 +33,9 @@ export type SerializedError = {
 };
 
 export function serializeError(subject: Error): SerializedError {
-  if (!(subject instanceof Error)) {
-    throw new Error('Non-error objects can not be serialized by this package');
-  }
   const data = {};
   for(const { property } of commonProperties) {
+    if (!(property in subject)) continue;
     data[property] = subject[property];
   }
   return data as SerializedError;
@@ -48,6 +46,7 @@ export function deserializeError(subject: SerializedError): Error {
   const output = new fn();
 
   for(const { property, enumerable } of commonProperties) {
+    if (!(property in subject)) continue;
     Object.defineProperty(output, property, {
       value: subject[property],
       enumerable,
