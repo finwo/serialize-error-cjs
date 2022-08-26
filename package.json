@@ -12,6 +12,13 @@
   "files": [
     "dist/"
   ],
+  "keywords": [
+    "error",
+    "serialize",
+    "stringify",
+    "convert",
+    "deserialize"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
