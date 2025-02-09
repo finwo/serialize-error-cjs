@@ -1,16 +1,6 @@
 import test from 'tape';
 import {deserializeError, serializeError} from '../src';
 
-// Minimally polyfill AggregateError
-if (!globalThis.AggregateError) {
-  class AggregateError extends Error {
-    constructor(private errors: Error[], message?: string) {
-      super(message);
-    };
-  }
-  globalThis.AggregateError = AggregateError;
-}
-
 function randomString(length: number): string {
   let output = '';
   while(output.length < length) output += Math.random().toString(36).substring(2);
