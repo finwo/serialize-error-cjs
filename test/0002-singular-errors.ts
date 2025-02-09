@@ -9,6 +9,9 @@ const singularConstructors = [
   SyntaxError,
   TypeError,
   URIError,
+  globalThis.DOMException,
+  globalThis.AssertionError,
+  globalThis.SystemError,
 ].filter(c => c);
 
 function randomString(length: number): string {
@@ -20,7 +23,7 @@ function randomString(length: number): string {
 test('Singular errors can be converted back-and-forth', t => {
   for(const singularConstructor of singularConstructors) {
     const err = new singularConstructor(randomString(16));
-    t.ok(err instanceof singularConstructor, 'Pre-serialization is an instance of given constructor');
+    t.ok(err instanceof singularConstructor, `Pre-serialization is an instance of ${singularConstructor.name}`);
 
     const serialized = serializeError(err);
     t.ok(serialized, 'Serialized error is truthy');
@@ -28,11 +31,10 @@ test('Singular errors can be converted back-and-forth', t => {
     t.equal(serialized.name, singularConstructor.name, 'Serialized name matches constructor name');
 
     const deserialized = deserializeError(serialized);
-    t.ok(deserialized instanceof singularConstructor, 'Deserialized is an instance of given constructor');
+    t.ok(deserialized instanceof singularConstructor, `Deserialized is an instance of ${singularConstructor.name}`);
 
     t.equal(deserialized.message, err.message, 'Deserialized message matches original');
   }
 
   t.end();
 });
-

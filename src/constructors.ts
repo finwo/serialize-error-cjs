@@ -6,6 +6,7 @@ const list: [string, ErrorConstructor][] = [
   SyntaxError,
   TypeError,
   URIError,
+  globalThis.DOMException,
   globalThis.AssertionError,
   globalThis.SystemError,
 ]

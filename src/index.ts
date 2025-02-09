@@ -5,10 +5,6 @@ const getErrorConstructor = (name: string) => errorConstructors.get(name) ?? Err
 
 const commonProperties: { property: string, enumerable: boolean }[] = [
   {
-    property: 'name',
-    enumerable: false,
-  },
-  {
     property: 'message',
     enumerable: false,
   },
@@ -43,6 +39,11 @@ export function serializeError(subject: Error): SerializedError {
   for(const { property } of commonProperties) {
     if (!(property in subject)) continue;
     data[property] = subject[property];
+  }
+  if (globalThis.DOMException && (subject instanceof globalThis.DOMException)) {
+    data.name = 'DOMException';
+  } else {
+    data.name = Object.getPrototypeOf(subject).name;
   }
   return data;
 }
