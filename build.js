@@ -1,10 +1,9 @@
 const esbuild = require('esbuild');
 const path = require('path');
-const package = require('./package.json');
-const tsconfig = require('./tsconfig.json');
 const globber = require('fast-glob');
-const fse = require('fs-extra');
-const { exec } = require('child_process');
+
+const tsconfigPath = path.join(__dirname, 'tsconfig.json');
+const tsconfig = require(tsconfigPath);
 
 const { dtsPlugin } = require('esbuild-plugin-d.ts');
 
@@ -18,22 +17,22 @@ const { dtsPlugin } = require('esbuild-plugin-d.ts');
   const options = {
     bundle: false,
     outdir,
-    target: 'node14',
+    target: tsconfig.compilerOptions.target,
     platform: 'node',
     format: 'cjs',
     sourcemap: tsconfig.compilerOptions.sourceMap,
-    tsconfig: path.join(__dirname, 'tsconfig.json'),
+    tsconfig: tsconfigPath,
     entryPoints,
-    plugins: [dtsPlugin()],
+    plugins: [dtsPlugin({tsconfig})],
   };
 
   console.log('Building');
   const result = await esbuild.build(options);
 
-  console.log({
-    options,
-    result,
-  });
+  //console.log({
+  //  options,
+  //  result,
+  //});
 
   if (result.errors.length) {
     console.log(result.errors);
@@ -47,4 +46,3 @@ const { dtsPlugin } = require('esbuild-plugin-d.ts');
 
   console.log('Done');
 })();
-
