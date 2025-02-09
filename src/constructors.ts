@@ -1,11 +1,11 @@
 const list: [string, ErrorConstructor][] = [
+  Error,
   EvalError,
   RangeError,
   ReferenceError,
   SyntaxError,
   TypeError,
   URIError,
-  globalThis.DOMException,
   globalThis.AssertionError,
   globalThis.SystemError,
 ]
