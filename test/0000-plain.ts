@@ -1,4 +1,4 @@
-import t from 'tap';
+import * as t from 'tape';
 
 import { serializeError, deserializeError } from '../src';
 
