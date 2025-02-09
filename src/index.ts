@@ -3,22 +3,48 @@ export { errorConstructors };
 
 const getErrorConstructor = (name: string) => errorConstructors.get(name) ?? Error;
 
-const commonProperties: { property: string, enumerable: boolean }[] = [
+const commonProperties: { name: string, descriptor: Partial<PropertyDescriptor>, deserialize?: (_:any)=>any, serialize?: (_:any)=>any }[] = [
   {
-    property: 'message',
-    enumerable: false,
+    name: 'message',
+    descriptor: {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    },
   },
   {
-    property: 'stack',
-    enumerable: false,
+    name: 'stack',
+    descriptor: {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    },
   },
   {
-    property: 'code',
-    enumerable: true,
+    name: 'code',
+    descriptor: {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    },
   },
   {
-    property: 'cause',
-    enumerable: false,
+    name: 'cause',
+    descriptor: {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    },
+  },
+  {
+    name: 'errors',
+    descriptor: {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    },
+    deserialize: (errors: SerializedError[]) => errors.map(error => deserializeError(error)),
+    serialize: (errors: Error[]) => errors.map(error => serializeError(error)),
   },
 ];
 
@@ -36,9 +62,11 @@ export function serializeError(subject: Error): SerializedError {
     message: '',
     stack  : '',
   };
-  for(const { property } of commonProperties) {
-    if (!(property in subject)) continue;
-    data[property] = subject[property];
+  for(const prop of commonProperties) {
+    if (!(prop.name in subject)) continue;
+    let value = subject[prop.name];
+    if (prop.serialize) value = prop.serialize(value);
+    data[prop.name] = value;
   }
   if (globalThis.DOMException && (subject instanceof globalThis.DOMException)) {
     data.name = 'DOMException';
@@ -48,17 +76,19 @@ export function serializeError(subject: Error): SerializedError {
   return data;
 }
 
-export function deserializeError(subject: SerializedError): Error {
-  const fn = getErrorConstructor(subject.name);
-  const output = new fn();
+export function deserializeError<T extends Error>(subject: SerializedError): T {
+  const con = getErrorConstructor(subject.name);
+  const output = Object.create(con.prototype);
 
-  for(const { property, enumerable } of commonProperties) {
-    if (!(property in subject)) continue;
-    Object.defineProperty(output, property, {
-      value: subject[property],
-      enumerable,
-      configurable: true,
-      writable: true,
+  for(const prop of commonProperties) {
+    if (!(prop.name in subject)) continue;
+
+    let value = subject[prop.name];
+    if (prop.deserialize) value = prop.deserialize(value);
+
+    Object.defineProperty(output, prop.name, {
+      ...prop.descriptor,
+      value: value,
     });
   }
 
