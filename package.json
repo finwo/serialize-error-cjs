@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx -y ts-node test/main.ts",
     "build": "node build.js",
     "check": "npm run check:eslint",
     "check:eslint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0"
