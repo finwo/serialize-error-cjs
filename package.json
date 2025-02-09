@@ -7,7 +7,8 @@
     "test": "npx -y ts-node test/main.ts",
     "build": "node build.js",
     "check": "npm run check:eslint",
-    "check:eslint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0"
+    "check:eslint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "postpublish": "PACKAGE_VERSION=$(node -p \"require('./package.json').version\") PACKAGE_NAME=$(node -p \"require('./package.json').name\") && npm deprecate \"${PACKAGE_NAME}@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\""
   },
   "files": [
     "dist/"
