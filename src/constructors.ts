@@ -1,4 +1,5 @@
 const list: [string, ErrorConstructor][] = [
+  Error,
   EvalError,
   RangeError,
   ReferenceError,
