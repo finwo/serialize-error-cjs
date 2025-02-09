@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "npx -y ts-node test/main.ts",
+    "test": "npx -y tap run",
     "build": "node build.js",
     "check": "npm run check:eslint",
     "check:eslint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 0"
@@ -31,14 +31,12 @@
   "funding": "https://github.com/sponsors/finwo",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^18.7.13",
+    "@types/node": "^22.13.1",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
-    "esbuild": "^0.15.5",
-    "esbuild-plugin-d.ts": "^1.1.0",
+    "esbuild": "^0.25.0",
+    "esbuild-plugin-d.ts": "^1.3.1",
     "eslint": "^8.22.0",
-    "fast-glob": "^3.2.11",
-    "fs-extra": "^10.1.0",
-    "typescript": "^4.8.2"
+    "tap": "^21.0.1"
   }
 }
