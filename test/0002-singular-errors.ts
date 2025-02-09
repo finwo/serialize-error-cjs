@@ -1,4 +1,4 @@
-import * as t from 'tape';
+import test from 'tape';
 import {deserializeError, serializeError} from '../src';
 
 const singularConstructors = [
@@ -17,7 +17,7 @@ function randomString(length: number): string {
   return output.substring(0, length);
 }
 
-t.test('Singular errors can be converted back-and-forth', t => {
+test('Singular errors can be converted back-and-forth', t => {
   for(const singularConstructor of singularConstructors) {
     const err = new singularConstructor(randomString(16));
     t.ok(err instanceof singularConstructor, 'Pre-serialization is an instance of given constructor');

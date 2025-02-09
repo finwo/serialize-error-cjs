@@ -1,4 +1,4 @@
-import * as t from 'tape';
+import test from 'tape';
 import {deserializeError, serializeError} from '../src';
 
 function randomString(length: number): string {
@@ -7,7 +7,7 @@ function randomString(length: number): string {
   return output.substring(0, length);
 }
 
-t.test('Singular errors can be converted back-and-forth', t => {
+test('Singular errors can be converted back-and-forth', t => {
 
   const testError = serializeError(new Error(randomString(16)));
   testError.name  = 'UnknownError';

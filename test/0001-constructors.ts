@@ -1,4 +1,4 @@
-import * as t from 'tape';
+import test from 'tape';
 
 import { errorConstructors } from '../src/constructors';
 
@@ -12,7 +12,7 @@ const expectedConstructors = [
   URIError,
 ].filter(c => c);
 
-t.test('Default error constructors', t => {
+test('Default error constructors', t => {
   t.ok(errorConstructors instanceof Map, 'Exported errorConstructors is a map');
 
   for(const expectedConstructor of expectedConstructors) {
