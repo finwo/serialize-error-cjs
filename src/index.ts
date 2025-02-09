@@ -30,15 +30,21 @@ export type SerializedError = {
   name: string;
   message: string;
   stack: string;
+  code?: string|number;
+  cause?: string;
 };
 
 export function serializeError(subject: Error): SerializedError {
-  const data = {};
+  const data: SerializedError = {
+    name   : 'Error',
+    message: '',
+    stack  : '',
+  };
   for(const { property } of commonProperties) {
     if (!(property in subject)) continue;
     data[property] = subject[property];
   }
-  return data as SerializedError;
+  return data;
 }
 
 export function deserializeError(subject: SerializedError): Error {
