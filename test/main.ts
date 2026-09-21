@@ -3,4 +3,6 @@ import './0001-constructors';
 import './0002-singular-errors';
 import './0003-unknown-error-deserialize';
 import './0004-aggregate-errors';
+import './0005-constructor-options';
+import './0006-error-names';
 

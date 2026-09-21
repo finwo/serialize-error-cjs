@@ -1,3 +1,5 @@
+import type { ErrorConstructorOptions } from './types';
+
 const list: [string, ErrorConstructor][] = [
   Error,
   EvalError,
@@ -17,3 +19,7 @@ const list: [string, ErrorConstructor][] = [
   );
 
 export const errorConstructors = new Map(list);
+
+export const errorConstructorOptions = new Map<string, ErrorConstructorOptions>([
+  ['AggregateError', { args: () => [[]] }],
+]);

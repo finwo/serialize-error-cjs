@@ -67,7 +67,35 @@ import {MyCustomError} from './errors.js'
 errorConstructors.set('MyCustomError', MyCustomError)
 ```
 
-**Warning:** Only simple errors are supported. The constructor of errors classes will **NOT** be called during deserialization, so if your custom error relies on it being called it will not work.
+**Note:** the constructor is called during deserialization, without arguments. The common properties (message, stack, code, cause, errors) are written onto the instance afterwards, so the constructor only has to survive being called as `new MyCustomError()`.
+
+If your class sets `this.name` in its constructor, that name is used as the key. If it sets nothing, the class name is used instead. Prefer assigning `this.name` explicitly: a string literal survives minification, a class name does not.
+
+### Constructor options
+
+Constructors that cannot be called as `new MyCustomError()` are configured through `errorConstructorOptions`:
+
+```js
+import {errorConstructors, errorConstructorOptions} from 'serialize-error-cjs';
+import {MyCustomError} from './errors.js'
+
+errorConstructors.set('MyCustomError', MyCustomError)
+
+// Build the arguments the constructor needs
+errorConstructorOptions.set('MyCustomError', {
+  args: serialized => [{ message: serialized.message }],
+})
+
+// Or skip the constructor entirely, using Object.create instead
+errorConstructorOptions.set('MyCustomError', { construct: false })
+```
+
+- `construct`: `boolean`, defaults to `true`. When `false`, the instance is built with `Object.create()` and the constructor is never called.
+- `args`: `(serialized: SerializedError) => unknown[]`, defaults to `() => []`. Builds the argument list handed to the constructor.
+
+`AggregateError` ships with `args` preconfigured, since its first parameter is a required iterable.
+
+If a constructor throws during deserialization, `serialize-error-cjs` falls back to `Object.create()` and warns once per error name. Deserialization itself never throws.
 
 ## API
 
@@ -87,4 +115,4 @@ Deserialize a plain object or any value into an `Error` object.
 - Custom properties are **NOT** preserved
 - Non-enumerable properties are kept non-enumerable (name, message, stack, cause)
 - Circular references are **NOT** handled
-- The constructor method of the class is **NOT** called
+- The constructor of the class **IS** called, without arguments, unless configured otherwise

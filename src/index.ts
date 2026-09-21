@@ -1,7 +1,39 @@
-import { errorConstructors } from './constructors';
-export { errorConstructors };
+import { errorConstructors, errorConstructorOptions } from './constructors';
+import type { SerializedError, ErrorConstructorOptions } from './types';
+
+export { errorConstructors, errorConstructorOptions };
+export type { SerializedError, ErrorConstructorOptions };
 
 const getErrorConstructor = (name: string) => errorConstructors.get(name) ?? Error;
+
+const warnedConstructors = new Set<string>();
+
+function warnConstructorFailure(name: string, cause: unknown): void {
+  if (warnedConstructors.has(name)) return;
+  warnedConstructors.add(name);
+  if (typeof console === 'undefined') return;
+  if (typeof console.warn !== 'function') return;
+  console.warn(
+    `serialize-error-cjs: the '${name}' constructor threw during deserialization, falling back to ` +
+    'Object.create. Configure errorConstructorOptions for this name to silence this warning.',
+    cause,
+  );
+}
+
+function getErrorName(subject: Error): string {
+  if (globalThis.DOMException && (subject instanceof globalThis.DOMException)) {
+    return 'DOMException';
+  }
+  // An assigned name is a string literal, so unlike a class name it survives minification.
+  const assigned = subject.name;
+  if (assigned && assigned !== 'Error') return assigned;
+  // Nothing assigned, fall back to the class name to catch bare Error subclasses.
+  try {
+    return Object.getPrototypeOf(subject)?.constructor?.name || assigned || 'Error';
+  } catch {
+    return assigned || 'Error';
+  }
+}
 
 const commonProperties: { name: string, descriptor: Partial<PropertyDescriptor>, deserialize?: (_:any)=>any, serialize?: (_:any)=>any }[] = [
   {
@@ -48,14 +80,6 @@ const commonProperties: { name: string, descriptor: Partial<PropertyDescriptor>,
   },
 ];
 
-export type SerializedError = {
-  name: string;
-  message: string;
-  stack: string;
-  code?: string|number;
-  cause?: string;
-};
-
 export function serializeError(subject: Error): SerializedError {
   const data: SerializedError = {
     name   : 'Error',
@@ -68,17 +92,25 @@ export function serializeError(subject: Error): SerializedError {
     if (prop.serialize) value = prop.serialize(value);
     data[prop.name] = value;
   }
-  if (globalThis.DOMException && (subject instanceof globalThis.DOMException)) {
-    data.name = 'DOMException';
-  } else {
-    data.name = Object.getPrototypeOf(subject).name;
-  }
+  data.name = getErrorName(subject);
   return data;
 }
 
 export function deserializeError<T extends Error>(subject: SerializedError): T {
-  const con = getErrorConstructor(subject.name);
-  const output = Object.create(con.prototype);
+  const con     = getErrorConstructor(subject.name);
+  const options = errorConstructorOptions.get(subject.name) ?? {};
+
+  let output;
+  if (options.construct === false) {
+    output = Object.create(con.prototype);
+  } else {
+    try {
+      output = Reflect.construct(con, options.args ? options.args(subject) : []);
+    } catch(e) {
+      warnConstructorFailure(subject.name, e);
+      output = Object.create(con.prototype);
+    }
+  }
 
   for(const prop of commonProperties) {
     if (!(prop.name in subject)) continue;
