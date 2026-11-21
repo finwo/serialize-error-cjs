@@ -3,7 +3,7 @@ export type SerializedError = {
   message: string;
   stack: string;
   code?: string|number;
-  cause?: string;
+  cause?: string|SerializedError;
   errors?: SerializedError[];
 };
 
