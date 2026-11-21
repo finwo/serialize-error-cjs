@@ -67,6 +67,12 @@ const commonProperties: { name: string, descriptor: Partial<PropertyDescriptor>,
       configurable: true,
       writable: true,
     },
+    deserialize: (cause: unknown) => {
+      const wire = cause as { name?: unknown, message?: unknown } | null;
+      if (!(wire && typeof wire === 'object' && typeof wire.name === 'string' && typeof wire.message === 'string')) return cause;
+      return deserializeError(wire as SerializedError);
+    },
+    serialize: (cause: unknown) => (cause instanceof Error ? serializeError(cause) : cause),
   },
   {
     name: 'errors',

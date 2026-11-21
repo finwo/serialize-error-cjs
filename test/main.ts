@@ -5,4 +5,5 @@ import './0003-unknown-error-deserialize';
 import './0004-aggregate-errors';
 import './0005-constructor-options';
 import './0006-error-names';
+import './0007-error-cause';
 
