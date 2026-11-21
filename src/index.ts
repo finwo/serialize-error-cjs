@@ -27,7 +27,7 @@ export type SerializedError = {
   message: string;
   stack: string;
   code?: string|number;
-  cause?: string;
+  cause?: string|SerializedError;
 };
 
 export function serializeError(subject: Error): SerializedError {
@@ -38,7 +38,9 @@ export function serializeError(subject: Error): SerializedError {
   };
   for(const { property } of commonProperties) {
     if (!(property in subject)) continue;
-    data[property] = subject[property];
+    let value = subject[property];
+    if (property === 'cause' && value instanceof Error) value = serializeError(value);
+    data[property] = value;
   }
   if (globalThis.DOMException && (subject instanceof globalThis.DOMException)) {
     data.name = 'DOMException';
@@ -54,8 +56,13 @@ export function deserializeError(subject: SerializedError): Error {
 
   for(const { property, enumerable } of commonProperties) {
     if (!(property in subject)) continue;
+    let value = subject[property];
+    if (property === 'cause') {
+      const wire = value as { name?: unknown, message?: unknown } | null;
+      if (wire && typeof wire === 'object' && typeof wire.name === 'string' && typeof wire.message === 'string') value = deserializeError(wire as SerializedError);
+    }
     Object.defineProperty(output, property, {
-      value: subject[property],
+      value,
       enumerable,
       configurable: true,
       writable: true,
