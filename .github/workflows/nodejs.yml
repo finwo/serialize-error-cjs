@@ -27,19 +27,21 @@ jobs:
       env:
         CI: true
 
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 23
-          registry-url: https://registry.npmjs.org/
-      - run: rm -rf node_modules
-      - run: npm install
-      - run: npm run build --if-present
-      - run: if [ $(npm view $(node -p "require('./package.json').name") version) != $(node -p "require('./package.json').version") ]; then npm publish ; fi
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+  # Publishing is manual since the 0.1 and 0.2 lines are maintained in parallel.
+  # See the Supported versions section in README.md.
+  # publish:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 23
+  #         registry-url: https://registry.npmjs.org/
+  #     - run: rm -rf node_modules
+  #     - run: npm install
+  #     - run: npm run build --if-present
+  #     - run: if [ $(npm view $(node -p "require('./package.json').name") version) != $(node -p "require('./package.json').version") ]; then npm publish ; fi
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.npm_token}}
