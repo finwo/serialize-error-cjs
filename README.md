@@ -13,6 +13,10 @@ Useful if you for example need to `JSON.stringify()` or `process.send()` the err
 npm install serialize-error-cjs
 ```
 
+## Supported versions
+
+The `0.3` line is the current release line. The `0.1` and `0.2` lines are maintained on the branches with the same name and receive critical fixes only. Install a maintained line with `npm install serialize-error-cjs@0.1` or `npm install serialize-error-cjs@0.2`.
+
 ## Usage
 
 ```js
